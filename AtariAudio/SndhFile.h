@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------
-	Atari Audio Library
+	Atari Audio Library v1.00
 	Small & accurate ATARI-ST audio emulation
 	Arnaud Carré aka Leonard/Oxygene
 	@leonard_coder
@@ -52,6 +52,7 @@ public:
 
 private:
 	uint16_t		Read16(const char*);
+	uint32_t		Read32(const char*);
 	const char*	skipNTString(const char* r);
 
 	bool	m_bLoaded;
@@ -62,7 +63,7 @@ private:
 	int		m_rawSize;
 
 	int		m_defaultSubSong;
-	int		m_subSongLen[kSubsongCountMax];
+	int		m_subSongLenInTick[kSubsongCountMax];
 	int		m_subSongCount;
 	int		m_playerRate;
 

@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------
-	Atari Audio Library
+	Atari Audio Library v1.00
 	Small & accurate ATARI-ST audio emulation
 	by Arnaud Carré aka Leonard/Oxygene
 	@leonard_coder
@@ -49,6 +49,14 @@ uint16_t	SndhFile::Read16(const char* r)
 	return v;
 }
 
+uint32_t	SndhFile::Read32(const char* r)
+{
+	assert(m_rawBuffer);
+	assert(r+4 <= (const char*)m_rawBuffer+m_rawSize);
+	uint32_t v = (Read16(r) << 16) | Read16(r + 2);
+	return v;
+}
+
 const char* SndhFile::skipNTString(const char* r)
 {
 	r += strlen(r) + 1;
@@ -80,7 +88,7 @@ bool	SndhFile::Load(const void* rawSndhFile, int sndhFileSize, uint32_t hostRepl
 	}
 
 	for (int i = 0; i < kSubsongCountMax; i++)
-		m_subSongLen[i] = 0;
+		m_subSongLenInTick[i] = 0;
 
 	const char* read8 = (const char*)m_rawBuffer;
 	if (m_rawSize > 16)
@@ -136,7 +144,7 @@ bool	SndhFile::Load(const void* rawSndhFile, int sndhFileSize, uint32_t hostRepl
 					memcpy(stemp, read8 + 2, 2);
 					stemp[2] = 0;
 					m_subSongCount = atoi(stemp);
-					if (m_subSongCount <= 0)	// some SNDH files have broken ## tag
+					if ((m_subSongCount <= 0) || (m_subSongCount > kSubsongCountMax))	// some SNDH files have broken ## tag
 						m_subSongCount = 1;
 					read8 += 4;
 				}
@@ -146,8 +154,20 @@ bool	SndhFile::Load(const void* rawSndhFile, int sndhFileSize, uint32_t hostRepl
 					read8 += 4;
 					for (int i = 0; i < m_subSongCount; i++)
 					{
-						m_subSongLen[i] = Read16(read8);
+						int lenInSec = Read16(read8);
+						assert(m_playerRate > 0);
+						m_subSongLenInTick[i] = lenInSec * m_playerRate;
 						read8 += 2;
+					}
+				}
+				else if (0 == strncmp(read8, "FRMS", 4))
+				{
+					assert(m_subSongCount > 0);
+					read8 += 4;
+					for (int i = 0; i < m_subSongCount; i++)
+					{
+						m_subSongLenInTick[i] = Read32(read8);
+						read8 += 4;
 					}
 				}
 				else if (0 == strncmp(read8, "HDNS", 4))
@@ -198,8 +218,7 @@ bool	SndhFile::GetSubsongInfo(int subSongId, SubSongInfo& out) const
 	if ((subSongId <= 0) || (subSongId > m_subSongCount))
 		return false;
 
-	const int songLen = m_subSongLen[subSongId - 1];
-	out.playerTickCount = songLen * m_playerRate;
+	out.playerTickCount = m_subSongLenInTick[subSongId - 1];
 	out.playerTickRate = m_playerRate;
 	out.samplePerTick = m_hostReplayRate / m_playerRate;
 	out.musicName = m_Title;

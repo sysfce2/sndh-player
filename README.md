@@ -1,10 +1,11 @@
-# SNDH-Archive-Player
+# SNDH-Archive-Player v1.00
 ATARI-ST SNDH ZIP Archive music browser/player by [Leonard/Oxygene](https://twitter.com/leonard_coder)
 
 ![image info](./thumbnail.png)
 
 # Versions
 
+- v1.00 : sndh2.2 song len support and official AtariAudio v1.00
 - v0.80 : fix minizip library when dealing with weird zip path name
 - v0.79 : minor STE DAC potential fix
 - v0.78 : fix oscilloscope scale issue in v0.77
