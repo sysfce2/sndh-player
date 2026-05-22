@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------
-	Atari Audio Library v1.00
+	Atari Audio Library v1.01
 	Small & accurate ATARI-ST audio emulation
 	Arnaud Carré aka Leonard/Oxygene
 	@leonard_coder
@@ -56,9 +56,9 @@ private:
 	const char*	skipNTString(const char* r);
 
 	bool	m_bLoaded;
-	char*	m_Title;
-	char*	m_Author;
-	char*	m_sYear;
+	const char*	m_Title;
+	const char*	m_Author;
+	const char*	m_sYear;
 	const void*	m_rawBuffer;
 	int		m_rawSize;
 

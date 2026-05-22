@@ -103,12 +103,15 @@ bool AsyncSndhStream::StartSubsong(int subSongId, int durationByDefaultInSec)
 	assert(info.playerTickRate > 0);
 
 	if (info.playerTickCount > 0)
+	{
 		m_lenInSec = info.playerTickCount / info.playerTickRate;
+		if (m_lenInSec <= 0)
+			m_lenInSec = 1;
+	}
 	else
 		m_lenInSec = durationByDefaultInSec;
 
-	if (m_lenInSec < 1)
-		return false;
+	assert(m_lenInSec >= 1);
 	
 	// keep reasonable buffer len
 	assert(uint64_t(m_lenInSec)*uint64_t(m_replayRate)*sizeof(int16_t) < 0x7fffffff);

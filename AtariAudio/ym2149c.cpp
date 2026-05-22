@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------
-	Atari Audio Library v1.00
+	Atari Audio Library v1.01
 	Small & accurate ATARI-ST audio emulation
 	Arnaud Carré aka Leonard/Oxygene
 	@leonard_coder
@@ -11,6 +11,8 @@
 #include "ym2149_tables.h"
 
 static uint32_t sRndSeed = 1;
+// this rnd func is only used at init time to randomize the square oscillator state
+// (it's *not* the ym2149 noise RNG)
 uint16_t stdLibRand()
 {
 	sRndSeed = sRndSeed*214013+2531011;
@@ -195,9 +197,10 @@ int16_t Ym2149c::ComputeNextSample(uint32_t* pSampleDebugInfo)
 	levels &= highMask;
 	assert(levels < 0x8000);
 
-	const int halfShiftA = (m_tonePeriod[0] > 1)?0:1;
-	const int halfShiftB = (m_tonePeriod[1] > 1)?0:1;
-	const int halfShiftC = (m_tonePeriod[2] > 1)?0:1;
+	// if period <=1 and TONE is active, empirically reduce final output value by 2 (some STF digisound use this mode)
+	const int halfShiftA = ((m_tonePeriod[0] > 1) || (m_regs[7]&(1<<0)))?0:1;
+	const int halfShiftB = ((m_tonePeriod[1] > 1) || (m_regs[7]&(1<<1)))?0:1;
+	const int halfShiftC = ((m_tonePeriod[2] > 1) || (m_regs[7]&(1<<2)))?0:1;
 
 	const uint32_t indexA = (levels >> 0) & 31;
 	const uint32_t indexB = (levels >> 5) & 31;

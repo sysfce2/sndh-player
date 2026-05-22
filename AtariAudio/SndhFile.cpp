@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------
-	Atari Audio Library v1.00
+	Atari Audio Library v1.01
 	Small & accurate ATARI-ST audio emulation
 	by Arnaud Carré aka Leonard/Oxygene
 	@leonard_coder
@@ -12,11 +12,8 @@
 
 SndhFile::SndhFile()
 {
-	m_rawBuffer = NULL;
-	m_Title = NULL;
-	m_Author = NULL;
-	m_sYear = NULL;
-	m_rawSize = 0;
+	m_rawBuffer = nullptr;
+	Unload();
 }
 
 SndhFile::~SndhFile()
@@ -27,14 +24,11 @@ SndhFile::~SndhFile()
 void	SndhFile::Unload()
 {
 	free((void*)m_rawBuffer);
-	free(m_Title);
-	free(m_Author);
-	free(m_sYear);
 	m_bLoaded = false;
-	m_rawBuffer = NULL;
-	m_Title = NULL;
-	m_Author = NULL;
-	m_sYear = NULL;
+	m_rawBuffer = nullptr;
+	m_Title = nullptr;
+	m_Author = nullptr;
+	m_sYear = nullptr;
 	m_rawSize = 0;
 	m_playerRate = 0;
 	m_subSongCount = -1;
@@ -119,12 +113,12 @@ bool	SndhFile::Load(const void* rawSndhFile, int sndhFileSize, uint32_t hostRepl
 				}
 				else if (0 == strncmp(read8, "TITL", 4))
 				{
-					m_Title = _strdup(read8 + 4);
+					m_Title = read8 + 4;
 					read8 = skipNTString(read8 + 4);
 				}
 				else if (0 == strncmp(read8, "COMM", 4))
 				{
-					m_Author = _strdup(read8 + 4);
+					m_Author = read8 + 4;
 					read8 = skipNTString(read8 + 4);
 				}
 				else if (	(0 == strncmp(read8, "RIPP", 4)) ||
@@ -135,7 +129,7 @@ bool	SndhFile::Load(const void* rawSndhFile, int sndhFileSize, uint32_t hostRepl
 				else if ((0 == strncmp(read8, "YEAR", 4)))
 				{
 					if ( read8[4] != 0)
-						m_sYear = _strdup(read8 + 4);	// many sndh files have "" as year string
+						m_sYear = read8 + 4;	// many sndh files have "" as year string
 					read8 = skipNTString(read8 + 4);
 				}
 				else if (0 == strncmp(read8, "##", 2))
