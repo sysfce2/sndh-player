@@ -8,10 +8,10 @@
 
 AsyncSndhStream::AsyncSndhStream()
 {
-	m_audioBuffer = NULL;
-	m_audioDebugBuffer = NULL;
-	m_bLoaded = false;
-	m_asyncInfo.thread = NULL;
+	m_audioBuffer = nullptr;
+	m_audioDebugBuffer = nullptr;
+	m_asyncInfo.sndh = nullptr;
+	m_asyncInfo.thread = nullptr;
 	m_playMode = PlayMode_Single;
 	m_advanceNext = false;
 	m_replayRate = kHostReplayRate;
@@ -25,7 +25,9 @@ AsyncSndhStream::~AsyncSndhStream()
 void AsyncSndhStream::Unload()
 {
 	CloseSubsong();
-	m_asyncInfo.sndh.Unload();
+	if (m_asyncInfo.sndh)
+		SndhRenderer::Destroy(m_asyncInfo.sndh);
+	m_asyncInfo.sndh = nullptr;
 }
 
 void AsyncSndhStream::CloseSubsong()
@@ -57,8 +59,8 @@ bool AsyncSndhStream::LoadSndh(const void* sndhFile, int fileSize, uint32_t repl
 {
 	Unload();
 	m_replayRate = replayRate;
-	m_bLoaded = m_asyncInfo.sndh.Load(sndhFile, fileSize, replayRate);
-	return m_bLoaded;
+	m_asyncInfo.sndh = SndhRenderer::Create(sndhFile, fileSize, m_replayRate);
+	return (m_asyncInfo.sndh != nullptr);
 }
 
 
@@ -80,7 +82,7 @@ void AsyncSndhStream::AsyncWorkerFunction()
 		if (m_asyncInfo.fillPos + todo > m_exactSongSamples)
 			todo = m_exactSongSamples - m_asyncInfo.fillPos;
 
-		m_asyncInfo.sndh.AudioRenderWithVisualInfos(m_audioBuffer + m_asyncInfo.fillPos, todo, m_audioDebugBuffer + m_asyncInfo.fillPos);
+		m_asyncInfo.sndh->AudioRenderWithVisualInfos(m_audioBuffer + m_asyncInfo.fillPos, todo, m_audioDebugBuffer + m_asyncInfo.fillPos);
 		m_asyncInfo.fillPos += todo;
 	}
 
@@ -112,15 +114,15 @@ void AsyncSndhStream::AsyncWorkerFunction()
 bool AsyncSndhStream::StartSubsong(int subSongId, int durationByDefaultInSec)
 {
 
-	if (!m_bLoaded)
+	if (nullptr == m_asyncInfo.sndh)
 		return false;
 
 	CloseSubsong();
 
-	if (!m_asyncInfo.sndh.InitSubSong(subSongId))
+	if (!m_asyncInfo.sndh->InitSubSong(subSongId))
 		return false;
 
-	m_exactSongSamples = m_asyncInfo.sndh.GetSubsongDurationSample(subSongId);
+	m_exactSongSamples = m_asyncInfo.sndh->GetSubsongDurationSample(subSongId);
 	if (m_exactSongSamples == 0)
 	{
 		// No length tag: fall back to the default duration, playing the full buffer
@@ -158,7 +160,7 @@ bool AsyncSndhStream::StartSubsong(int subSongId, int durationByDefaultInSec)
 
 	// Generate first second of music
 	const uint32_t firstChunkSize = (m_exactSongSamples >= m_replayRate) ? m_replayRate : m_exactSongSamples;
-	m_asyncInfo.sndh.AudioRenderWithVisualInfos(m_audioBuffer, firstChunkSize, m_audioDebugBuffer);
+	m_asyncInfo.sndh->AudioRenderWithVisualInfos(m_audioBuffer, firstChunkSize, m_audioDebugBuffer);
 
 	// launch worker thread to generate
 	m_asyncInfo.forceQuit = false;

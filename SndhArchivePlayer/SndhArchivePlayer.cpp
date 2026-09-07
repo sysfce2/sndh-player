@@ -29,8 +29,8 @@ SndhArchivePlayer::~SndhArchivePlayer()
 bool	SndhArchivePlayer::StartSubsong(int subsong)
 {
 	bool ret = false;
-	const SndhFile& sf = m_sndh.GetSndhFile();
-	if ((subsong >= 1) && (subsong <= sf.GetSongInfo().subsongCount))
+	const SndhRenderer* sf = m_sndh.GetSndhFile();
+	if ((subsong >= 1) && (subsong <= sf->GetSongInfo().subsongCount))
 	{
 		if (m_sndh.StartSubsong(subsong, gDefaultDurationInMin*60))
 		{
@@ -58,7 +58,7 @@ bool	SndhArchivePlayer::LoadNewMusic(const char* sFilename)
 
 		if (m_sndh.LoadSndh(sndhBuffer, sndhSize, kHostReplayRate))
 		{
-			if ( StartSubsong(m_sndh.GetSndhFile().GetSongInfo().defaultSubsong))
+			if ( StartSubsong(m_sndh.GetSndhFile()->GetSongInfo().defaultSubsong))
 				ret = true;
 		}
 		free(sndhBuffer);
@@ -84,7 +84,7 @@ void	SndhArchivePlayer::PlayZipEntry(SndhArchive& sndhArchive, int zipIndex)
 				m_sndh.Unload();
 				if (m_sndh.LoadSndh(unpack, int(size), kHostReplayRate))
 				{
-					StartSubsong(m_sndh.GetSndhFile().GetSongInfo().defaultSubsong);
+					StartSubsong(m_sndh.GetSndhFile()->GetSongInfo().defaultSubsong);
 				}
 			}
 			free(unpack);
@@ -344,15 +344,15 @@ void	SndhArchivePlayer::UpdateImGui()
 
 //		if (ImGui::BeginTable("song", 2, ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_NoBordersInBody))
 
-		const SndhFile& sf = m_sndh.GetSndhFile();
-		const SndhFile::SongInfo& info = sf.GetSongInfo();
-		if (info.subsongCount > 0)	// if sndh file isn't loaded, subsongCount would be 0
+		const SndhRenderer* sf = m_sndh.GetSndhFile();
+		if (sf)	// if sndh file isn't loaded, subsongCount would be 0
 		{
+			const SndhRenderer::SongInfo& info = sf->GetSongInfo();
 			if (ImGui::BeginTable("song", 2, ImGuiTableFlags_NoBordersInBody))
 			{
 				ImGui::TableSetupColumn("info", ImGuiTableColumnFlags_WidthFixed, 80.0f);
 
-				const uint32_t len = sf.GetSubsongDurationMs(m_currentSubSong) / 1000;
+				const uint32_t len = sf->GetSubsongDurationMs(m_currentSubSong) / 1000;
 
 				int dir = 0;
 				ImGui::TableNextColumn();
@@ -395,7 +395,7 @@ void	SndhArchivePlayer::UpdateImGui()
 				if (dir)
 				{
 					int newSubsong = m_currentSubSong + dir;
-					const int subsongCount = m_sndh.GetSndhFile().GetSongInfo().subsongCount;
+					const int subsongCount = m_sndh.GetSndhFile()->GetSongInfo().subsongCount;
 
 					// Random mode always shuffles to a new file when moving forward,
 					// whether triggered by the user or by natural end-of-song
@@ -541,12 +541,17 @@ void	SndhArchivePlayer::UpdateImGui()
 
 	static MemoryEditor mem_edit;
 	mem_edit.ReadOnly = true;
-	const SndhFile::SongInfo& si = m_sndh.GetSndhFile().GetSongInfo();
-	const void* rdata = si.rawBinaryPlayer;
-	mem_edit.DrawWindow(kWndFileViewer, (void*)rdata, si.rawBinaryPlayerSize);
+	const void* rdata = nullptr;
+	size_t rdatasize = 0;
+	if (m_sndh.GetSndhFile())
+	{
+		const SndhRenderer::SongInfo& si = m_sndh.GetSndhFile()->GetSongInfo();
+		rdata = si.rawBinaryPlayer;
+		rdatasize = si.rawBinaryPlayerSize;
+	}
+	mem_edit.DrawWindow(kWndFileViewer, (void*)rdata, rdatasize);
 
 	DrawPlayList();
-
 
 	ImGui::PopStyleVar();
 

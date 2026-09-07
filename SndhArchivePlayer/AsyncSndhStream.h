@@ -37,7 +37,7 @@ public:
 	void	DrawGui(const char* musicName);
 
 	static void sAsyncSndhWorkerThread(void* a);
-	const SndhFile& GetSndhFile() const { return m_asyncInfo.sndh; }
+	const SndhRenderer* GetSndhFile() const { return m_asyncInfo.sndh; }
 
 private:
 	void SetReplayPosInSec(int pos);
@@ -49,10 +49,9 @@ private:
 		std::atomic <uint32_t> fillPos;
 		std::thread*	thread;
 		std::atomic<bool> forceQuit;
-		SndhFile sndh;
+		SndhRenderer* sndh;
 	};
 
-	bool m_bLoaded;
 	std::atomic<int> playOffsetInSec;
 	HWAVEOUT	m_waveOutHandle;
 	WAVEHDR		m_waveHeader;

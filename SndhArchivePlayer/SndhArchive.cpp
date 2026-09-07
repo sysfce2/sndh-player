@@ -49,19 +49,20 @@ bool SndhArchive::LoadZipEntry(int itemId, int workerId)
 		if (depackSize == size)
 		{
 			const char* fname = zip_entry_name(zip);
-			SndhFile sndhFile;
-			if (sndhFile.Load(unpack, int(size), kHostReplayRate))		// dummy host replay rate
+			SndhRenderer* sr = SndhRenderer::Create(unpack, uint32_t(size), kHostReplayRate);		// dummy host replay rate
+			if (sr)		// dummy host replay rate
 			{
-				const SndhFile::SongInfo& si = sndhFile.GetSongInfo();
+				const SndhRenderer::SongInfo& si = sr->GetSongInfo();
 				item.author = si.musicAuthor ? _strdup(si.musicAuthor) : _strdup("Not defined");
 				item.title = si.musicName ? _strdup(si.musicName) : _strdup(fname);
 				uint32_t totalLenMs = 0;
 				for (int s = 0; s < si.subsongCount; s++)
-					totalLenMs += sndhFile.GetSubsongDurationMs(s + 1);
+					totalLenMs += sr->GetSubsongDurationMs(s + 1);
 				item.duration = totalLenMs / 1000;
 				item.year = nullptr;
 				item.subsongCount = si.subsongCount;
 				ret = true;
+				SndhRenderer::Destroy(sr);
 			}
 		}
 		free(unpack);
@@ -243,6 +244,7 @@ void	SndhArchive::ImGuiDraw(SndhArchivePlayer& player)
 					// Demonstrate using clipper for large vertical lists
 					ImGuiListClipper clipper;
 					clipper.Begin(count);
+					static int selectedZipIndex = -1;
 					while (clipper.Step())
 					{
 						for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; row++)
@@ -261,9 +263,10 @@ void	SndhArchive::ImGuiDraw(SndhArchivePlayer& player)
 
 							ImGui::TableSetColumnIndex(1);
 							const ImGuiSelectableFlags selectable_flags = ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowOverlap;
-							if (ImGui::Selectable(item.title, false, selectable_flags, ImVec2(0, 0)))
+							if (ImGui::Selectable(item.title, (item.zipIndex == selectedZipIndex), selectable_flags, ImVec2(0, 0)))
 							{
 								player.PlayZipEntry(*this, item.zipIndex);
+								selectedZipIndex = item.zipIndex;
 							}
 
 							ImGui::TableSetColumnIndex(2);

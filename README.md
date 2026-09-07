@@ -1,10 +1,11 @@
-# SNDH-Archive-Player v1.07
+# SNDH-Archive-Player v1.08
 ATARI-ST SNDH ZIP Archive music browser/player by [Leonard/Oxygene](https://twitter.com/leonard_coder)
 
 ![image info](./thumbnail.png)
 
 # Versions
 
+- v1.08 : visual feedback on current playing music. Use AtariAudio lib v1.09
 - v1.07 : use AtariAudio lib v1.08
 - v1.06 : use AtariAudio lib v1.07
 - v1.05 : use AtariAudio lib v1.06

@@ -24,7 +24,7 @@
     <ClCompile Include="AtariAudio\src\external\Musashi\m68kcpu.c" />
     <ClCompile Include="AtariAudio\src\external\Musashi\m68kops.c" />
     <ClCompile Include="AtariAudio\src\Mk68901.cpp" />
-    <ClCompile Include="AtariAudio\src\SndhFile.cpp" />
+    <ClCompile Include="AtariAudio\src\SndhRenderer.cpp" />
     <ClCompile Include="AtariAudio\src\SteDac.cpp" />
     <ClCompile Include="AtariAudio\src\timedb.cpp" />
     <ClCompile Include="AtariAudio\src\ym2149c.cpp" />
@@ -53,7 +53,7 @@
     <ClInclude Include="AtariAudio\src\external\Musashi\m68kops.h" />
     <ClInclude Include="AtariAudio\src\external\timedb.inc.h" />
     <ClInclude Include="AtariAudio\src\Mk68901.h" />
-    <ClInclude Include="AtariAudio\src\SndhFile.h" />
+    <ClInclude Include="AtariAudio\src\SndhRenderer.h" />
     <ClInclude Include="AtariAudio\src\SteDac.h" />
     <ClInclude Include="AtariAudio\src\timedb.h" />
     <ClInclude Include="AtariAudio\src\ym2149c.h" />
