@@ -87,17 +87,20 @@
     <ClCompile Include="AtariAudio\src\ym2149c.cpp">
       <Filter>Source Files\AtariAudio</Filter>
     </ClCompile>
-    <ClCompile Include="AtariAudio\src\external\Musashi\m68kcpu.c">
-      <Filter>Source Files\AtariAudio\external\Musashi</Filter>
-    </ClCompile>
-    <ClCompile Include="AtariAudio\src\external\Musashi\m68kops.c">
-      <Filter>Source Files\AtariAudio\external\Musashi</Filter>
-    </ClCompile>
     <ClCompile Include="AtariAudio\src\external\ice_24.c">
       <Filter>Source Files\AtariAudio\external</Filter>
     </ClCompile>
     <ClCompile Include="AtariAudio\src\SndhRenderer.cpp">
       <Filter>Source Files\AtariAudio</Filter>
+    </ClCompile>
+    <ClCompile Include="AtariAudio\src\external\Musashi\m68k.cpp">
+      <Filter>Source Files\AtariAudio\external\Musashi</Filter>
+    </ClCompile>
+    <ClCompile Include="AtariAudio\src\external\Musashi\m68kcpu.cpp">
+      <Filter>Source Files\AtariAudio\external\Musashi</Filter>
+    </ClCompile>
+    <ClCompile Include="AtariAudio\src\external\Musashi\m68kops.cpp">
+      <Filter>Source Files\AtariAudio\external\Musashi</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

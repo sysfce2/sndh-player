@@ -5160,7 +5160,7 @@ mz_zip_array_range_check(const mz_zip_array *pArray, mz_uint index) {
 }
 #define MZ_ZIP_ARRAY_ELEMENT(array_ptr, element_type, index)                   \
   ((element_type *)((array_ptr)                                                \
-                        ->m_p))[mz_zip_array_range_check(array_ptr, index)]
+                        ->m_p))[mz_zip_array_range_check(array_ptr, (mz_uint)(index))]
 #else
 #define MZ_ZIP_ARRAY_ELEMENT(array_ptr, element_type, index)                   \
   ((element_type *)((array_ptr)->m_p))[index]

@@ -21,8 +21,9 @@
   <ItemGroup>
     <ClCompile Include="AtariAudio\src\AtariMachine.cpp" />
     <ClCompile Include="AtariAudio\src\external\ice_24.c" />
-    <ClCompile Include="AtariAudio\src\external\Musashi\m68kcpu.c" />
-    <ClCompile Include="AtariAudio\src\external\Musashi\m68kops.c" />
+    <ClCompile Include="AtariAudio\src\external\Musashi\m68k.cpp" />
+    <ClCompile Include="AtariAudio\src\external\Musashi\m68kcpu.cpp" />
+    <ClCompile Include="AtariAudio\src\external\Musashi\m68kops.cpp" />
     <ClCompile Include="AtariAudio\src\Mk68901.cpp" />
     <ClCompile Include="AtariAudio\src\SndhRenderer.cpp" />
     <ClCompile Include="AtariAudio\src\SteDac.cpp" />
